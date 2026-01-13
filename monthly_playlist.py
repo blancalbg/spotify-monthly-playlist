@@ -80,6 +80,13 @@ if not playlist_id:
         f.write(f"{month_id}:{playlist_id}\n")
     print(f"Created new playlist '{playlist_name}'.")
 
+    # Print track names only when playlist is newly created
+    if track_uris:
+        print(f"Tracks to add ({len(track_uris)}):")
+        for uri in track_uris:
+            track_info = sp.track(uri)
+            print("-", track_info["name"], "by", ", ".join([a["name"] for a in track_info["artists"]]))
+
 # Fetch existing tracks in playlist
 existing_tracks = []
 limit = 100
@@ -101,15 +108,6 @@ if not new_tracks:
     print(f"All tracks for {month_name} are already in the playlist. Nothing to add.")
     exit()
 
-# Print tack names
-if track_uris:
-    print(f"Tracks to add ({len(track_uris)}):")
-    for uri in track_uris:
-        track_info = sp.track(uri)
-        print("-", track_info["name"], "by", ", ".join([a["name"] for a in track_info["artists"]]))
-else:
-    print(f"No Liked Songs added in {month_name}. Nothing to add.")
-    exit()
 
 # Add tracks to the playlist
 sp.playlist_add_items(playlist_id, track_uris)
