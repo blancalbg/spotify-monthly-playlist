@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 import subprocess
 
 app = FastAPI()
@@ -17,8 +17,14 @@ def run_playlist():
         print("===== ERRORS =====")
         print(result.stderr)
 
+    if result.returncode != 0:
+        raise HTTPException(
+            status_code=500,
+            detail=result.stderr or "Playlist script failed"
+        )
+
     return {
-        "status": "success" if result.returncode == 0 else "error",
-        "stdout": result.stdout,
-        "stderr": result.stderr
+        "status": "success",
+        "output": result.stdout
     }
+
