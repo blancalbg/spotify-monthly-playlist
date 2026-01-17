@@ -44,7 +44,18 @@ limit = 50
 offset = 0
 
 while True:
-    results = sp.current_user_saved_tracks(limit=limit, offset=offset)
+    # Retry up to 3 times for network/API issues
+    for attempt in range(3):
+        try:
+            results = sp.current_user_saved_tracks(limit=limit, offset=offset)
+            break  # success, exit retry loop
+        except spotipy.SpotifyException as e:
+            print(f"Spotify API error, retrying ({attempt+1}/3)...")
+            import time; time.sleep(5)
+    else:
+        # all retries failed → raise error to propagate
+        raise Exception(f"Failed to fetch liked songs after 3 attempts: {e}")
+
     if not results["items"]:
         break
 
@@ -56,6 +67,7 @@ while True:
     offset += limit
     if len(results["items"]) < limit:
         break
+
 
 # Remove duplicates
 track_uris = list(set(track_uris))

@@ -27,4 +27,3 @@ def run_playlist():
         "status": "success",
         "output": result.stdout
     }
-
